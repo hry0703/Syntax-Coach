@@ -1,0 +1,50 @@
+[
+  {
+    "id": "coffee_shop",
+    "title_zh": "咖啡店点单",
+    "title_en": "Ordering at a café",
+    "role": "Barista",
+    "level": "B1",
+    "description": "点咖啡、确认杯型与口味的日常对话"
+  },
+  {
+    "id": "job_interview",
+    "title_zh": "求职面试",
+    "title_en": "Job interview",
+    "role": "Interviewer",
+    "level": "B2",
+    "description": "自我介绍、经历与行为问题"
+  },
+  {
+    "id": "meeting",
+    "title_zh": "工作会议",
+    "title_en": "Team meeting",
+    "role": "Colleague",
+    "level": "B1",
+    "description": "汇报进度、提出建议、约定下一步"
+  },
+  {
+    "id": "asking_directions",
+    "title_zh": "问路",
+    "title_en": "Asking for directions",
+    "role": "Local",
+    "level": "A2",
+    "description": "询问路线、确认地标与距离"
+  },
+  {
+    "id": "complaint",
+    "title_zh": "消费投诉",
+    "title_en": "Making a complaint",
+    "role": "Customer Service",
+    "level": "B1",
+    "description": "礼貌说明问题并请求解决"
+  },
+  {
+    "id": "scheduling",
+    "title_zh": "约时间",
+    "title_en": "Scheduling a meeting",
+    "role": "Assistant",
+    "level": "A2",
+    "description": "协商日期、时间与改期"
+  }
+]

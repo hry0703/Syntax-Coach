@@ -1,0 +1,17 @@
+{
+  "id": "articles_a_an_the",
+  "title_zh": "冠词 a / an / the",
+  "cefr": "A2",
+  "category": "冠词",
+  "rule_zh": "首次提到、泛指单数可数名词用 a/an；双方都知道指哪一个时用 the。元音音素开头用 an，不是看字母。",
+  "wrong_patterns": [
+    "I want latte",
+    "an university",
+    "the life is hard"
+  ],
+  "examples": [
+    "I want a latte, please.",
+    "The latte you ordered is ready."
+  ],
+  "contrast": "a/an = 某一个；the = 那个已知的；不可数/泛指复数常不用冠词。"
+}

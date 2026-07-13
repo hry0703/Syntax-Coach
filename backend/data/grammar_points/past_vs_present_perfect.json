@@ -1,0 +1,16 @@
+{
+  "id": "past_vs_present_perfect",
+  "title_zh": "现在完成时 vs 一般过去时",
+  "cefr": "A2",
+  "category": "时态",
+  "rule_zh": "yesterday、last week、ago 等明确过去时间点必须用一般过去时；现在完成时表示与现在有关的完成，不能和具体过去时间连用。go 的过去分词是 gone，不是 went。",
+  "wrong_patterns": [
+    "have went + yesterday",
+    "have + V-ed + yesterday/last/ago"
+  ],
+  "examples": [
+    "I went to this café yesterday.",
+    "I have been here before."
+  ],
+  "contrast": "有具体过去时间 → 一般过去时；强调到现在的经历/结果 → 现在完成时。"
+}

@@ -1,0 +1,40 @@
+# Virtual env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Tests / type check / coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs / local
+*.log
+.cache/
+
+# Editor / OS
+.idea/
+.vscode/
+*.sw?
+.DS_Store

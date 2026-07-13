@@ -1,0 +1,17 @@
+{
+  "id": "prepositions_in_on_at",
+  "title_zh": "介词 in / on / at",
+  "cefr": "A2",
+  "category": "介词",
+  "rule_zh": "时间：at 时刻，on 日期/星期，in 月/年/较长时段。地点：at 点，on 表面，in 内部/区域。",
+  "wrong_patterns": [
+    "in Monday",
+    "at 2020",
+    "on the morning"
+  ],
+  "examples": [
+    "See you at 3 pm on Monday.",
+    "I will travel in July."
+  ],
+  "contrast": "记住常见搭配比死记规则更有效：at night / in the morning / on the weekend。"
+}

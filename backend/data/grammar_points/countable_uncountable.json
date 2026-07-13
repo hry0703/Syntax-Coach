@@ -1,0 +1,17 @@
+{
+  "id": "countable_uncountable",
+  "title_zh": "可数 / 不可数名词",
+  "cefr": "A2",
+  "category": "名词",
+  "rule_zh": "不可数名词（advice、information、coffee 作为物质时）一般不加 a/an，复数也不随便加 -s；可用 some / a cup of / a piece of 计量。",
+  "wrong_patterns": [
+    "an advice",
+    "many informations",
+    "two coffees" 
+  ],
+  "examples": [
+    "Can I have some advice?",
+    "I'd like a cup of coffee."
+  ],
+  "contrast": "点单语境里 two coffees 口语常见，书面/考试更稳妥说 two cups of coffee。"
+}
