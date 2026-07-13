@@ -1,57 +1,54 @@
+"""
+FastAPI 应用入口 ≈ 前端的 createApp() + 全局插件。
+
+启动：uv run uvicorn app.main:app --reload --port 8000
+文档：http://127.0.0.1:8000/docs （Swagger，自带）
+
+请求链路：Router → Pydantic 校验 → services →（Agent / DB）→ JSON
+"""
+
 from __future__ import annotations
+
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import chat, grammar, mistakes, profile, review, scenes
+from app.db.database import init_db
 from app.schemas.models import HealthResponse
 
 OPENAPI_TAGS = [
-    {
-        "name": "health",
-        "description": "服务探活，用于确认后端进程可用。",
-    },
-    {
-        "name": "scenes",
-        "description": "口语陪练场景列表（角色 + 情境），开聊前先选场。",
-    },
-    {
-        "name": "chat",
-        "description": "会话与消息：创建场景会话、发送用户话轮，返回角色回复与结构化语法卡片。",
-    },
-    {
-        "name": "grammar",
-        "description": "本地语法点知识库（JSON）。Agent 出卡后会按 id 合并稳定规则与例句。",
-    },
-    {
-        "name": "mistakes",
-        "description": "错题本：按 grammar_point_id 沉淀薄弱点，支持标记已掌握。当前为内存存储。",
-    },
-    {
-        "name": "review",
-        "description": "基于薄弱语法点的复习抽题与提交（部分接口仍为占位）。",
-    },
-    {
-        "name": "profile",
-        "description": "用户偏好：难度、学习目标、纠错严格度与讲解详略。",
-    },
+    {"name": "health", "description": "服务探活"},
+    {"name": "scenes", "description": "口语陪练场景"},
+    {"name": "chat", "description": "会话与消息（含 Agent 语法卡）"},
+    {"name": "grammar", "description": "本地语法点知识库"},
+    {"name": "mistakes", "description": "错题本（SQLite）"},
+    {"name": "review", "description": "复习（部分 stub）"},
+    {"name": "profile", "description": "用户偏好（SQLite）"},
 ]
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # 启动时建表（没有则创建）—— 类似 migrate 的极简版
+    init_db()
+    yield
+
 
 app = FastAPI(
     title="SyntaxCoach API",
     description=(
         "语法解析型口语陪练后端。\n\n"
-        "**主路径**：选场景 → 对话 → 右侧语法卡片 → 加入错题 → 复习。\n\n"
-        "- 对话是入口，**结构化 GrammarCard** 是卖点（改对 + 讲规则）。\n"
-        "- `severity: error` 表示明确错误；`suggestion` 表示更好说法。\n"
-        "- 错题按 `grammar_point_id` 归档，不是只存聊天记录。\n"
-        "- Agent：LangGraph（`llm_turn` → `enrich_kb`）；失败时 chat 回退 stub。\n\n"
-        "交互文档：`/docs`（Swagger）与 `/redoc`。"
+        "主路径：选场景 → 对话 → 语法卡片 → 错题 → 复习。\n"
+        "Agent：LangGraph（llm_turn → enrich_kb）；失败回退 stub。"
     ),
     version="0.1.0",
     openapi_tags=OPENAPI_TAGS,
+    lifespan=lifespan,
 )
 
+# why：Vite :5173 调 :8000 跨域，需显式放行
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -71,8 +68,6 @@ app.add_middleware(
     response_model=HealthResponse,
     tags=["health"],
     summary="健康检查",
-    description="返回服务是否存活。前端或部署探活可轮询此接口；不依赖外部 LLM / 密钥。",
-    response_description="正常时 `status` 为 `ok`。",
 )
 def health() -> HealthResponse:
     return HealthResponse()

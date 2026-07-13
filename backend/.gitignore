@@ -24,6 +24,10 @@ htmlcov/
 .tox/
 .nox/
 
+# Local DB
+*.db
+db.sqlite3
+
 # Env / secrets
 .env
 .env.*

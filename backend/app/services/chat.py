@@ -1,3 +1,12 @@
+"""
+对话编排服务（非 HTTP）。
+
+View 调用这里；这里再决定走 Agent 还是 stub。
+≈ 前端的 composable / store action：管会话状态，不直接碰 DOM。
+
+会话目前仍在进程内存 `_SESSIONS`（重启会丢）；错题/偏好走 SQLAlchemy → SQLite。
+"""
+
 from __future__ import annotations
 
 import logging
@@ -15,6 +24,7 @@ from app.services.agent import run_coach_turn
 
 logger = logging.getLogger(__name__)
 
+# session_id → { scene, history, turn... }；多 worker 部署时需换 Redis/DB
 _SESSIONS: dict[str, dict] = {}
 
 
@@ -33,6 +43,7 @@ def _find_scene(scene_id: str) -> dict:
 
 
 def create_session(scene_id: str, level: str | None = None) -> CreateSessionResponse:
+    """开一场陪练：生成 session_id，前端后续发消息都带它。"""
     scene = _find_scene(scene_id)
     session_id = str(uuid.uuid4())
     _SESSIONS[session_id] = {
@@ -46,7 +57,11 @@ def create_session(scene_id: str, level: str | None = None) -> CreateSessionResp
 
 
 def stub_grammar_card(user_text: str) -> GrammarCard:
-    """Fallback when LLM is unavailable."""
+    """
+    LLM 未配置或 Agent 抛错时的兜底卡。
+
+    why：接口不能因模型挂了就 500；前端仍能看到一版语法卡 UI。
+    """
     point = get_grammar_point("past_vs_present_perfect") or {}
     original = user_text.strip() or "I have went here yesterday, so medium is fine."
     span_text = "have went"
@@ -73,8 +88,15 @@ def stub_grammar_card(user_text: str) -> GrammarCard:
 
 
 def handle_message(session_id: str, content: str) -> ChatMessageResponse:
+    """
+    一轮对话：
+      有密钥 → LangGraph Agent
+      失败/无密钥 → stub 卡 + 友好英文回复
+    最后把 user/assistant 写入 history（截断最近 20 条）。
+    """
     session = _SESSIONS.get(session_id)
     if session is None:
+        # 容错：未知 session 仍继续聊，避免前端刷新后整页挂掉
         session = {
             "scene_id": "unknown",
             "scene": _find_scene("unknown"),

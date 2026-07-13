@@ -1,3 +1,11 @@
+"""
+领域模型（Pydantic）≈ TypeScript interface + 运行时校验。
+
+FastAPI 路由直接用这些模型做请求/响应；
+Agent 内部也用同一套（尤其 GrammarCard）。
+前端类型：frontend/src/types/index.ts —— 改字段三处对齐。
+"""
+
 from __future__ import annotations
 
 from typing import Literal

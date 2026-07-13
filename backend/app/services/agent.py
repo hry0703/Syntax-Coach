@@ -1,3 +1,16 @@
+"""
+LangGraph Agent：口语角色回复 + 结构化语法卡。
+
+和「一次 ChatCompletion」的差别：
+  - 状态 CoachState 在节点间传递（像流水线）
+  - 图：START → llm_turn → enrich_kb → END
+  - llm_turn：调模型拿 JSON（reply + 可选 card）
+  - enrich_kb：用本地 KB 覆盖稳定 rule_zh / examples（模型别自由发挥规则文案）
+
+入口：run_coach_turn() ← chat.handle_message()
+与 Django 无关；换 Web 框架也能复用。
+"""
+
 from __future__ import annotations
 
 import json
@@ -12,6 +25,9 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.kb.loader import get_grammar_point, list_grammar_points
 from app.schemas.models import ErrorSpan, GrammarCard
+
+
+# --- LLM 输出的临时形状（校验用）；最终对外仍是 GrammarCard ---
 
 
 class LlmErrorSpan(BaseModel):
@@ -33,12 +49,16 @@ class LlmGrammarCard(BaseModel):
 
 
 class CoachTurn(BaseModel):
+    """模型被要求只吐这一个 JSON 对象。"""
+
     reply: str
     has_grammar_issue: bool = False
     grammar_card: LlmGrammarCard | None = None
 
 
 class CoachState(TypedDict):
+    """图状态：每个节点读/写其中一部分字段。"""
+
     user_text: str
     scene: dict[str, Any]
     history: list[dict[str, str]]
@@ -55,7 +75,7 @@ def _build_llm() -> ChatOpenAI:
         "base_url": settings["openai_base_url"],
         "temperature": 0.4,
     }
-    # DeepSeek V4 thinking 模型不支持 tool_choice；关闭 thinking，要求纯 JSON 文本
+    # why：DeepSeek thinking 模式与 tool_choice 不兼容；关 thinking，要纯 JSON 文本
     base = (settings["openai_base_url"] or "").lower()
     if "deepseek" in base:
         kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
@@ -63,6 +83,7 @@ def _build_llm() -> ChatOpenAI:
 
 
 def _grammar_catalog() -> str:
+    """塞进 system prompt 的允许 id 列表，避免模型编造 grammar_point_id。"""
     lines: list[str] = []
     for point in list_grammar_points():
         lines.append(
@@ -113,6 +134,7 @@ Allowed grammar points:
 
 
 def _history_messages(history: list[dict[str, str]]) -> list:
+    """多轮上下文 → LangChain Message；只取最近 8 条控制 token。"""
     messages = []
     for item in history[-8:]:
         role = item.get("role")
@@ -125,6 +147,7 @@ def _history_messages(history: list[dict[str, str]]) -> list:
 
 
 def _extract_json(text: str) -> dict[str, Any]:
+    """模型偶发包 ```json；尽量抠出对象再 parse。"""
     text = text.strip()
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text)
@@ -139,6 +162,7 @@ def _extract_json(text: str) -> dict[str, Any]:
 
 
 def llm_turn(state: CoachState) -> dict[str, Any]:
+    """节点 1：调 LLM，解析为 reply + 可选 GrammarCard。"""
     llm = _build_llm()
     scene = state["scene"]
     messages = [
@@ -173,10 +197,16 @@ def llm_turn(state: CoachState) -> dict[str, Any]:
             severity=raw.severity,
         )
 
+    # 只返回要合并进 state 的字段
     return {"reply": result.reply, "grammar_card": card}
 
 
 def enrich_kb(state: CoachState) -> dict[str, Any]:
+    """
+    节点 2：按 grammar_point_id 读本地 JSON，覆盖规则/例句。
+
+    why：模型负责「发现错误 + 改句」；稳定讲解文案以 KB 为准。
+    """
     card = state.get("grammar_card")
     if card is None:
         return {}
@@ -201,6 +231,7 @@ def enrich_kb(state: CoachState) -> dict[str, Any]:
 
 
 def build_coach_graph():
+    """组装图：线性两节点。以后加 validate_spans 等就 add_node + add_edge。"""
     graph = StateGraph(CoachState)
     graph.add_node("llm_turn", llm_turn)
     graph.add_node("enrich_kb", enrich_kb)
@@ -214,6 +245,7 @@ _GRAPH = None
 
 
 def get_coach_graph():
+    """懒加载单例，避免每次请求重新 compile。"""
     global _GRAPH
     if _GRAPH is None:
         _GRAPH = build_coach_graph()
@@ -227,6 +259,7 @@ def run_coach_turn(
     history: list[dict[str, str]],
     level: str,
 ) -> tuple[str, GrammarCard | None]:
+    """对外唯一入口：跑完图，返回 (英文回复, 语法卡|None)。"""
     graph = get_coach_graph()
     result = graph.invoke(
         {

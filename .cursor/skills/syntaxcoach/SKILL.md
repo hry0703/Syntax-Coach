@@ -25,11 +25,12 @@ description: >-
 |-------|--------|
 | Frontend | Vue 3 + Vite + TypeScript + Vue Router |
 | Backend | FastAPI + Uvicorn + Pydantic（uv + `pyproject.toml`）|
+| Persist | SQLite + SQLAlchemy（`app/db/`，错题/偏好）|
 | KB | `backend/data/grammar_points/*.json` |
 | Node | 22（根目录 `.nvmrc`） |
 | Agent | LangChain + LangGraph + langchain-openai（已接入） |
 
-Do **not** introduce React, Next.js, Nest, Streamlit, or agent-craft-specific SDKs unless the user explicitly asks.
+Do **not** introduce React, Next.js, Nest, Streamlit, Django, or agent-craft-specific SDKs unless the user explicitly asks.
 
 ## Layout
 
@@ -40,13 +41,18 @@ frontend/src/
   api/            client + endpoints（/api proxy → :8000）
   styles/tokens.css
 backend/app/
+  main.py         FastAPI 入口 + CORS + lifespan 建表
   api/            scenes, chat, grammar, mistakes, review, profile
   schemas/models.py
   services/chat.py     ← Agent 接入点
+  services/agent.py
+  services/memory_store.py
+  db/             SQLAlchemy engine + MistakeRow / ProfileRow
   kb/loader.py
 backend/data/
   scenes.json
   grammar_points/
+  syntaxcoach.db  # runtime
 ```
 
 ## UI conventions
@@ -87,5 +93,6 @@ backend/data/
 
 ## References
 
+- 分步 TODO：[TODO.md](../../../TODO.md)（仓库根目录）
 - 契约与 JSON 示例：[reference.md](reference.md)
 - 产品 README：仓库根目录 `README.md`

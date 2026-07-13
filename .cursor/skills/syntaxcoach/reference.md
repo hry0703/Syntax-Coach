@@ -74,8 +74,7 @@ Path: `backend/data/grammar_points/<id>.json`
 nvm use
 
 # backend
-cd backend && source .venv/bin/activate
-uvicorn app.main:app --reload --port 8000
+cd backend && uv sync && uv run uvicorn app.main:app --reload --port 8000
 
 # frontend
 cd frontend && npm run dev

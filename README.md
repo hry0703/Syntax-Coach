@@ -2,7 +2,8 @@
 
 语法解析型口语陪练 Web：边聊边拆句，按语法点沉淀错题并带动复习。
 
-> 当前为 **骨架阶段**：可启动前后端、展示双栏对话 + 语法卡片；业务 Agent / 持久化尚未接入。
+> 当前为 **骨架阶段**：可启动前后端、双栏对话 + 语法卡片；错题/偏好已 SQLite 持久化。  
+> 后续任务清单见根目录 [TODO.md](TODO.md)，按 M2 → M3 → M4 逐步实现。
 
 ## 技术栈
 
@@ -10,9 +11,10 @@
 |---|---|
 | 前端 | Vue 3 + Vite + TypeScript + Vue Router |
 | 后端 | FastAPI + Uvicorn + Pydantic |
+| 数据 | SQLite + SQLAlchemy |
+| Agent | LangChain + LangGraph + langchain-openai |
 | 语法知识库 | 本地 JSON（按 id 读取） |
 | Node | **22**（见根目录 `.nvmrc`） |
-| 下一阶段 Agent | **LangChain + LangGraph + langchain-openai**（结构化输出 GrammarCard） |
 
 前后端分离：`frontend/` 与 `backend/` 独立启动；开发时 Vite 将 `/api` 代理到 `http://127.0.0.1:8000`。
 
@@ -22,10 +24,17 @@
 syntaxCoach/
   frontend/          # Vue3 应用
   backend/
-    app/             # FastAPI 路由 / schema / stub services
+    app/
+      main.py        # FastAPI 入口
+      api/           # 路由（≈ endpoints）
+      schemas/       # Pydantic 模型
+      services/      # chat + agent + memory_store
+      db/            # SQLAlchemy
+      kb/
     data/
       scenes.json
-      grammar_points/  # 语法点知识库示例
+      grammar_points/
+      syntaxcoach.db # 运行后自动生成
 ```
 
 ## 启动
@@ -46,7 +55,8 @@ uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-文档：http://127.0.0.1:8000/docs
+文档：http://127.0.0.1:8000/docs  
+探活：http://127.0.0.1:8000/api/health
 
 ### 前端
 
@@ -62,15 +72,10 @@ npm run dev
 
 选场景 → 对话 → 右侧语法卡片 → 加入薄弱语法点 → 复习（占位）
 
-## 下一阶段已接入：Agent
+## Agent
 
 入口：`backend/app/services/chat.py` → `app/services/agent.py`（LangGraph：`llm_turn` → `enrich_kb`）
 
-行为：
-1. 场景角色英文回复
-2. 结构化语法卡片 JSON（失败则 stub 回退）
-3. 按 `grammar_point_id` 用本地 KB 覆盖稳定 `rule_zh` / `examples`
+配置见 `backend/.env`（参考 `.env.example`）。
 
-配置见 `backend/.env`（参考 `.env.example`）。DeepSeek 兼容端点已适配（关闭 thinking + 纯 JSON 输出）。
-
-后续可做：错题持久化、复习引擎、会话小结。
+后续可做：见 [TODO.md](TODO.md)。
