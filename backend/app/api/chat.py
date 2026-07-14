@@ -6,8 +6,9 @@ FastAPI 路由 ≈ 前端 endpoints.ts / vue-router。
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Path
 
+from app.exceptions import AppError
 from app.schemas.models import (
     ChatMessageRequest,
     ChatMessageResponse,
@@ -40,5 +41,5 @@ def post_message(
 ) -> ChatMessageResponse:
     """对应前端 sendMessage()；真正 Agent 在 services/chat.py。"""
     if not body.content.strip():
-        raise HTTPException(status_code=400, detail="content is required")
+        raise AppError("content is required", status_code=400)
     return chat_service.handle_message(session_id, body.content)

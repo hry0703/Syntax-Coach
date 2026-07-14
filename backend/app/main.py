@@ -15,6 +15,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import chat, grammar, mistakes, profile, review, scenes
+from app.api.envelope_middleware import ResponseEnvelopeMiddleware
+from app.api.exception_handlers import register_exception_handlers
 from app.db.database import init_db
 from app.schemas.models import HealthResponse
 
@@ -48,6 +50,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# 统一信封：{ code, data, errorMsg }；成功 code=0，失败 code=HTTP 状态数字
+register_exception_handlers(app)
+# 中间件后注册的先执行请求侧；响应包装放 CORS 内侧
+app.add_middleware(ResponseEnvelopeMiddleware)
+
 # why：Vite :5173 调 :8000 跨域，需显式放行
 app.add_middleware(
     CORSMiddleware,
@@ -71,7 +78,6 @@ app.add_middleware(
 )
 def health() -> HealthResponse:
     return HealthResponse()
-
 
 app.include_router(scenes.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")

@@ -20,6 +20,7 @@
 - [ ] 新增图节点 `validate_spans`：校验 `error_spans` 下标合法，非法则修正或丢弃
 - [ ] 小评测脚本：固定例句 → 检查 `grammar_point_id` 是否合理（可放 `backend/scripts/`）
 - [ ] Agent 失败时打日志保留原始 LLM 文本，便于排查
+- [ ] （长会话后再做）上下文压缩：历史超阈值时摘要旧轮次，保留 `summary` + 最近 N 轮原文（替代纯 `history[-20:]` 硬截断）
 
 ### M3 — 复习闭环 + Tools
 
@@ -30,7 +31,7 @@
 
 ### M4 — 工程化
 
-- [ ] 统一 API 错误格式（如 `{ "detail": "..." }`），前端错误提示对齐
+- [x] 统一 API 信封 `{ code, data, errorMsg }`（成功 `code=0`；失败 `code` 为 HTTP 数字）
 - [ ] 基础测试：scenes / mistakes CRUD / chat stub 路径（pytest）
 - [ ] 关键请求日志（session_id、turn、是否走 stub）
 - [ ] （可选）会话持久化：`ChatSession` / 消息入 SQLite，替代内存 `_SESSIONS`

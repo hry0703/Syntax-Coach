@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+# 缓存配置，避免重复读取环境变量
 @lru_cache(maxsize=1)
 def get_settings() -> dict[str, str | None]:
     return {
