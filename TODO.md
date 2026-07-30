@@ -37,6 +37,15 @@
 - [ ] （可选）会话持久化：`ChatSession` / 消息入 SQLite，替代内存 `_SESSIONS`
 - [ ] （可选）Alembic 数据库迁移（表结构变更更规范）
 
+### M5 — 语法点知识库运维（后置；当前 JSON 够用）
+
+- [ ] 语法点入库：表 `grammar_points`，字段对齐现有 JSON；`loader` 改查库（可保留 JSON 导入种子）
+- [ ] 维护页：**优先做在现有 Vue 前端**（如「知识库」路由：列表 / 增删改），复用 tokens 与 `/api`
+- [ ] 后端 CRUD：`GET/POST/PATCH/DELETE /api/grammar-points`
+- [ ] （可选）独立运营后台 / 鉴权：仅当非开发人员长期改库、或要和学员端强隔离时再拆
+
+> 选型约定：MVP 不另搭 Admin；先前端内嵌维护页。点很多或要 CMS 再考虑独立后台。
+
 ---
 
 ## 刻意后置（先不做）
