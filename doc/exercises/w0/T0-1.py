@@ -11,7 +11,7 @@ def normalize(text:str)->str:
         text = text[:-1]
     return text
 
-def test_normalize():
+def test_normalize()->None:
     assert normalize("  hi  ") == "hi"
     assert normalize("  ") == ""
     assert normalize("hi") == "hi"

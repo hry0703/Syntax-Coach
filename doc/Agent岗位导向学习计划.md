@@ -66,18 +66,18 @@
 每题写完在旁边记一句话：「对应前端的 ___」。
 
 #### Day 1～3｜Python 语法手感
-- [ ] **T0-1 函数**：写 `normalize(text: str) -> str`，去掉首尾空白；空串返回 `""`。再写测试：`"  hi  "` → `"hi"`
-- [ ] **T0-2 类**：写 `Scene` 类，字段 `id / title_zh / level`；实现 `__str__` 打印可读一行
-- [ ] **T0-3 异常**：读一个不存在的文件路径，用 `try/except FileNotFoundError` 打印友好中文，不要让进程裸崩
-- [ ] **T0-4 模块**：把上面函数/类拆成 `utils.py` + `main.py`，用 `from utils import ...` 调用
+- [x] **T0-1 函数**：写 `normalize(text: str) -> str`，去掉首尾空白；空串返回 `""`。再写测试：`"  hi  "` → `"hi"`
+- [x] **T0-2 类**：写 `Scene` 类，字段 `id / title_zh / level`；实现 `__str__` 打印可读一行
+- [x] **T0-3 异常**：读一个不存在的文件路径，用 `try/except FileNotFoundError` 打印友好中文，不要让进程裸崩
+- [x] **T0-4 模块**：把上面函数/类拆成 `utils.py` + `main.py`，用 `from utils import ...` 调用
 
 #### Day 4～5｜类型提示
-- [ ] **T0-5**：给 T0-1～T0-2 全部补上 Type Hints（参数、返回值）
-- [ ] **T0-6**：写函数 `load_scenes(path: str) -> list[dict[str, str]]`，用 `json.load` 读本仓库 `backend/data/scenes.json`（只读，别改文件）
-- [ ] **T0-7**：用 `str | None` 写一个可选参数：`find_scene(scenes, scene_id) -> dict | None`
+- [x] **T0-5**：给 T0-1～T0-2 全部补上 Type Hints（参数、返回值）
+- [x] **T0-6**：写函数 `load_scenes(path: str) -> list[dict[str, str]]`，用 `json.load` 读本仓库 `backend/data/scenes.json`（只读，别改文件）
+- [x] **T0-7**：用 `str | None` 写一个可选参数：`find_scene(scenes, scene_id) -> dict | None`
 
 #### Day 6～7｜虚拟环境与依赖
-- [ ] **T0-8**：用 `uv`（或 venv）新建环境；`pip/uv add httpx`（或 `requests`），`uv sync` / 冻结依赖
+- [x] **T0-8**：用 `uv`（或 venv）新建环境；`pip/uv add httpx`（或 `requests`），`uv sync` / 冻结依赖
 - [ ] **T0-9**：写脚本请求公开 API（如 `https://httpbin.org/get`），打印 status code + JSON 里某个字段
 - [ ] **T0-10**：故意写错包名安装，看报错；再故意 `import` 未安装的包，看报错 —— 笔记里各记一行「怎么读」
 
@@ -287,6 +287,7 @@
 | [07-全栈项目实战.md](./07-全栈项目实战.md) | 全栈整合 |
 | [08-工具与资源.md](./08-工具与资源.md) | 工具资源 |
 | [README.md](./README.md) | 原完整学习路线（可对照） |
+| [uv常用命令.md](./uv常用命令.md) | T0-8：虚拟环境、uv add / sync、锁文件 |
 
 ---
 
